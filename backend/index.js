@@ -1,12 +1,22 @@
 const { Client } = require('pg');
 const express = require('express')
+const cors = require('cors')
 
 const app = express()
 const port = 3000
 
+//Pèsquisar o que é CORS
+app.use(cors())
 app.use(express.json());
 
-
+const client = new Client({
+  user: 'postgres',
+  host: 'localhost',
+  database: 'crud',
+  password: '123456',
+  port: 5432, // Default PostgreSQL port
+});
+client.connect()
 
 app.listen(port, () => {
   console.log(`Example app listening on port ${port}`)
@@ -16,33 +26,15 @@ app.listen(port, () => {
 // Get - Lista todos os contatos
 app.get('/contact', (req, res) => {
   // Create a new PostgreSQL client
-  const client = new Client({
-    user: 'postgres',
-    host: 'localhost',
-    database: 'lista-contatos',
-    password: '123456',
-    port: 5432, // Default PostgreSQL port
-  });
-
-  // Connect to the PostgreSQL database
-  client.connect()
-    .then(() => {
-      console.log('Connected to PostgreSQL database');
-      // Example query
-      const query = 'SELECT * FROM contact';
-      // Execute the query
-      return client.query(query);
-    })
-    .then((result) => {
+  const query = 'SELECT id, name FROM contact';
+  // Execute the query
+  client.query(query)
+    .then(result => {
       res.json(result.rows);
+    }).catch(err => {
+      res.status(400).json({mensagem: 'Erro ao listar contatos'});
     })
-    .catch((err) => {
-      console.error('Error executing query', err);
-    })
-    .finally(() => {
-      // Close the connection to the database
-      client.end();
-    });
+
 })
 
 // Get - Retornar apenas um contato
@@ -50,7 +42,7 @@ app.get('/contact/:id', (req, res) => {
   const client = new Client({
     user: 'postgres',
     host: 'localhost',
-    database: 'lista-contatos',
+    database: 'crud',
     password: '123456',
     port: 5432, // Default PostgreSQL port
   });
@@ -65,7 +57,7 @@ app.get('/contact/:id', (req, res) => {
       return client.query(query);
     })
     .then((result) => {
-      res.json(result.rows);
+      res.json(result.rows[0]);
     })
     .catch((err) => {
       console.error('Error executing query', err);
@@ -84,11 +76,11 @@ app.post('/contact', (req, res) => {
   const client = new Client({
     user: 'postgres',
     host: 'localhost',
-    database: 'lista-contatos',
+    database: 'crud',
     password: '123456',
     port: 5432, // Default PostgreSQL port
   });
-  
+
   // Connect to the PostgreSQL database
   client.connect()
     .then(() => {
@@ -99,7 +91,7 @@ app.post('/contact', (req, res) => {
       return client.query(query);
     })
     .then((result) => {
-      res.send('Registro inserido com seucesso!');
+      res.json({ status: 'Registro inserido com seucesso!' });
     })
     .catch((err) => {
       console.error('Error executing query', err);
@@ -117,7 +109,7 @@ app.put('/contact/:id', (req, res) => {
   const client = new Client({
     user: 'postgres',
     host: 'localhost',
-    database: 'lista-contatos',
+    database: 'crud',
     password: '123456',
     port: 5432, // Default PostgreSQL port
   });
@@ -132,7 +124,7 @@ app.put('/contact/:id', (req, res) => {
       return client.query(query);
     })
     .then((result) => {
-      res.send('Registro atualizado com seucesso!');
+      res.json({ status: 'Registro atualizado com seucesso!' });
     })
     .catch((err) => {
       console.error('Error executing query', err);
@@ -148,7 +140,7 @@ app.delete('/contact/:id', (req, res) => {
   const client = new Client({
     user: 'postgres',
     host: 'localhost',
-    database: 'lista-contatos',
+    database: 'crud',
     password: '123456',
     port: 5432, // Default PostgreSQL port
   });
@@ -163,7 +155,7 @@ app.delete('/contact/:id', (req, res) => {
       return client.query(query);
     })
     .then((result) => {
-      res.send('Registro removido com seucesso!');
+      res.json({ status: 'Registro removido com seucesso!' });
     })
     .catch((err) => {
       console.error('Error executing query', err);

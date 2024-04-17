@@ -1,0 +1,25 @@
+<button (click)="redirecionarParaFormularioDeCadastro()">
+    Cadastrar
+</button>
+
+<table>
+    <thead>
+        <tr>
+            <th>Nome</th>
+            <th>Ações</th>
+        </tr>
+    </thead>
+    <tbody>
+        <ng-container *ngFor="let documento of lista">
+            <tr>
+                <th>
+                    {{documento.name}}
+                </th>
+                <th>
+                    <button (click)="editarContato(documento)">Editar</button>
+                    <button (click)="removerContato(documento)">Remover</button>
+                </th>
+            </tr>
+        </ng-container>
+    </tbody>
+</table>
