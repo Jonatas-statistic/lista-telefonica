@@ -21,7 +21,9 @@ export class FormularioContatoComponent {
 
   contato: any = {
     name: '',
-    phone: ''
+    phone: '',
+    email: '',
+    description: '',
   }
 
   constructor(

@@ -12,7 +12,7 @@ app.use(express.json());
 const client = new Client({
   user: 'postgres',
   host: 'localhost',
-  database: 'crud',
+  database: 'lista-telefonica',
   password: '123456',
   port: 5432, // Default PostgreSQL port
 });
@@ -42,7 +42,7 @@ app.get('/contact/:id', (req, res) => {
   const client = new Client({
     user: 'postgres',
     host: 'localhost',
-    database: 'crud',
+    database: 'lista-telefonica',
     password: '123456',
     port: 5432, // Default PostgreSQL port
   });
@@ -52,7 +52,7 @@ app.get('/contact/:id', (req, res) => {
     .then(() => {
       console.log('Connected to PostgreSQL database');
       // Example query
-      const query = `SELECT *  FROM contact where id = ${req.params['id']}`;
+      const query = `SELECT id, name, phone, email, description FROM contact where id = ${req.params['id']}`;
       // Execute the query
       return client.query(query);
     })
@@ -71,12 +71,15 @@ app.get('/contact/:id', (req, res) => {
 // Post - Insere um novo contato no banco de dados
 app.post('/contact', (req, res) => {
   const data = req.body
+  
+  let name = data['name'];
+  name = name.toUpperCase();
 
   // Create a new PostgreSQL client
   const client = new Client({
     user: 'postgres',
     host: 'localhost',
-    database: 'crud',
+    database: 'lista-telefonica',
     password: '123456',
     port: 5432, // Default PostgreSQL port
   });
@@ -86,7 +89,7 @@ app.post('/contact', (req, res) => {
     .then(() => {
       console.log('Connected to PostgreSQL database');
       // Example query
-      const query = `INSERT INTO contact(name, phone) VALUES ('${data['name']}', '${data['phone']}')`;
+      const query = `INSERT INTO contact(name, phone, email, description) VALUES ('${name}', '${data['phone']}', '${data['email']}', '${data['description']}')`;
       // Execute the query
       return client.query(query);
     })
@@ -106,10 +109,13 @@ app.post('/contact', (req, res) => {
 app.put('/contact/:id', (req, res) => {
   const data = req.body
 
+  let name = data['name'];
+  name = name.toUpperCase();
+
   const client = new Client({
     user: 'postgres',
     host: 'localhost',
-    database: 'crud',
+    database: 'lista-telefonica',
     password: '123456',
     port: 5432, // Default PostgreSQL port
   });
@@ -119,7 +125,7 @@ app.put('/contact/:id', (req, res) => {
     .then(() => {
       console.log('Connected to PostgreSQL database');
       // Example query
-      const query = `UPDATE contact SET name = '${data['name']}', phone = '${data['phone']}' WHERE id = ${req.params['id']}`
+      const query = `UPDATE contact SET name = '${name}', phone = '${data['phone']}', email = '${data['email']}', description = '${data['description']}' WHERE id = ${req.params['id']}`
       // Execute the query
       return client.query(query);
     })
@@ -140,7 +146,7 @@ app.delete('/contact/:id', (req, res) => {
   const client = new Client({
     user: 'postgres',
     host: 'localhost',
-    database: 'crud',
+    database: 'lista-telefonica',
     password: '123456',
     port: 5432, // Default PostgreSQL port
   });
