@@ -5,7 +5,7 @@ const cors = require('cors')
 const app = express()
 const port = 3000
 
-//Pèsquisar o que é CORS
+// Pesquisar o que é CORS
 app.use(cors())
 app.use(express.json());
 
@@ -69,11 +69,19 @@ app.get('/contact/:id', (req, res) => {
 })
 
 // Post - Insere um novo contato no banco de dados
-app.post('/contact', (req, res) => {
-  const data = req.body
-  
-  let name = data['name'];
-  name = name.toUpperCase();
+  app.post('/contact', (req, res) => {
+   const { name, phone, email, description } = req.body;
+
+   if (!name || !phone) {
+    return res.status(400).json({ mensagem: 'Nome e telefone são campos obrigatórios!' });
+  }
+  const formattedName = name.toUpperCase();
+  const formattedPhone = phone.replace(/\D/g, '');
+
+  const query = {
+    text: 'INSERT INTO contact(name, phone, email, description) VALUES ($1, $2, $3, $4)',
+    values: [formattedName, formattedPhone, email, description]
+  };
 
   // Create a new PostgreSQL client
   const client = new Client({
@@ -94,7 +102,7 @@ app.post('/contact', (req, res) => {
       return client.query(query);
     })
     .then((result) => {
-      res.json({ status: 'Registro inserido com seucesso!' });
+      res.json({ status: 'Registro inserido com sucesso!' });
     })
     .catch((err) => {
       console.error('Error executing query', err);
@@ -107,10 +115,14 @@ app.post('/contact', (req, res) => {
 
 // Put - Atualiza um contato no banco de dados
 app.put('/contact/:id', (req, res) => {
-  const data = req.body
-
-  let name = data['name'];
-  name = name.toUpperCase();
+    const { name, phone, email, description } = req.body;
+  
+    if (!name || !phone) {
+      return res.status(400).json({ mensagem: 'Nome e telefone são campos obrigatórios!' });
+    }
+  
+    const formattedName = name.toUpperCase();
+    const formattedPhone = phone.replace(/\D/g, '');
 
   const client = new Client({
     user: 'postgres',
@@ -125,7 +137,7 @@ app.put('/contact/:id', (req, res) => {
     .then(() => {
       console.log('Connected to PostgreSQL database');
       // Example query
-      const query = `UPDATE contact SET name = '${name}', phone = '${data['phone']}', email = '${data['email']}', description = '${data['description']}' WHERE id = ${req.params['id']}`
+      const query = `UPDATE contact SET name = '${formattedName}', phone = '${formattedPhone}', email = '${email}', description = '${description}' WHERE id = ${req.params['id']}`
       // Execute the query
       return client.query(query);
     })
